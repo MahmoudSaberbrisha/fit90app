@@ -1,0 +1,16 @@
+# ملف key.properties - قم بنسخ هذا الملف إلى key.properties واملأ القيم
+# هذا الملف يحتوي على معلومات التوقيع للتطبيق
+# ⚠️ مهم: لا ترفع ملف key.properties إلى Git!
+
+# مسار ملف keystore (يجب أن يكون في مجلد android/app/)
+storeFile=../app/fit90gym-release-key.jks
+
+# اسم الـ alias في keystore
+keyAlias=fit90gym
+
+# كلمة مرور keystore
+storePassword=YOUR_STORE_PASSWORD
+
+# كلمة مرور الـ key
+keyPassword=YOUR_KEY_PASSWORD
+

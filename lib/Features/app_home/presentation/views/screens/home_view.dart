@@ -1,0 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:fit90_gym_main/features/app_home/presentation/views/widgets/home_view_body.dart';
+
+class HomeView extends StatelessWidget {
+  const HomeView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.black,
+      body: HomeViewBody(),
+    );
+  }
+}

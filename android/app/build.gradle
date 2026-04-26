@@ -1,0 +1,140 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '2'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.1'
+}
+
+
+
+
+
+  def keystoreProperties = new Properties()
+      def keystorePropertiesFile = rootProject.file('key.properties')
+      if (keystorePropertiesFile.exists()) {
+          keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+      }
+
+
+android {
+    compileSdkVersion 36
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+                coreLibraryDesugaringEnabled true
+
+       sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.metacodecx.fit90"
+        namespace "com.metacodecx.fit90"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 35
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        
+        // R8 configuration to ignore missing Play Core classes
+        // These classes are referenced by Flutter but not used in this app
+        missingDimensionStrategy 'androidx.work', 'none'
+    }
+
+    
+   signingConfigs {
+       release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                def keystorePath = keystoreProperties['storeFile']
+                if (keystorePath != null) {
+                    storeFile file(keystorePath)
+                }
+                storePassword keystoreProperties['storePassword']
+            }
+          }
+     }
+     
+    buildTypes {
+        debug {
+            // تحسين سرعة البناء في وضع التطوير
+            minifyEnabled false
+            shrinkResources false
+        }
+        release {
+            // Only generate debug symbols if needed for crash reporting
+            // FULL debug symbols slow down builds significantly
+            ndk {
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'r8-rules.pro'
+            
+            // R8 configuration - ignore missing classes warnings
+            // This allows R8 to proceed even if Play Core classes are missing
+            // (They're not used since we don't use deferred components)
+        }
+    }
+    //  buildTypes {
+    //     release {
+    //         // TODO: Add your own signing config for the release build.
+    //         // Signing with the debug keys for now, so `flutter run --release` works.
+    //         signingConfig = signingConfigs.debug
+            
+    //     }
+    // }
+
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0"
+    implementation platform('com.google.firebase:firebase-bom:32.1.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx:22.1.0'
+
+    // Google Play Core Library removed - incompatible with SDK 34+
+    // Flutter deferred components are not used, so we don't need Play Core
+    // R8 rules in proguard-rules.pro handle missing classes
+
+    // If you need deferred components, use Play Feature Delivery instead:
+    // implementation 'com.google.android.play:feature-delivery:2.1.0'
+    // implementation 'com.google.android.play:asset-delivery:2.2.2'
+
+    // Core library desugaring
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.2"}
